@@ -2,12 +2,12 @@ const express = require("express");
 const fs = require("fs");
 
 const app = express();
-const PORT = process.env.PORT || 3000; // ✅ FIXED FOR AZURE
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const DB = "users.json"; // ✅ must match filename
+const DB = "users.json";
 
 function readDB() {
   if (!fs.existsSync(DB)) return [];
@@ -17,6 +17,11 @@ function readDB() {
 function writeDB(data) {
   fs.writeFileSync(DB, JSON.stringify(data, null, 2));
 }
+
+// ✅ ROOT ROUTE (IMPORTANT)
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
+});
 
 // SIGNUP
 app.post("/signup", (req, res) => {
@@ -70,6 +75,7 @@ app.get("/subjects/:email", (req, res) => {
   res.json(user ? user.subjects : []);
 });
 
-app.listen(PORT, () => {
+// ✅ IMPORTANT FIX (Azure)
+app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port " + PORT);
 });
